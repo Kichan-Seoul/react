@@ -1,21 +1,22 @@
-import { useEffect, useState } from 'react';
-import {Button, Nav} from 'react-bootstrap';
-import { useParams, useNavigate } from 'react-router-dom';
-import { addItem } from '../store/store';
-import { useDispatch } from 'react-redux';
+import { useContext, useEffect, useState } from 'react';
+import {Button, Nav,} from 'react-bootstrap';
+import { useParams } from 'react-router-dom';
+import { Context1 } from '../App';
 
 function Detail(props) {
+    /*
+    // useContext(받은것)
+    let a = useContext(Context1);
+    console.log(a);
+    console.log(a.stock);
+    */
 
-    //1. localStorage 가져오기
-
-    //2. 배열로 형변환
-    //3. 배열에 넣기
-    //4. localStorage 넣기
-
-    let dispatch = useDispatch()
-    const nav = useNavigate()
+    let {stock, clothes} = useContext(Context1);
+    console.log(stock);
+    console.log(clothes);
 
     let {pid} = useParams();
+
     let findId = props.clothes.find((v) => v.id == pid)
 
     let[alert, setAlert]= useState(true);
@@ -45,11 +46,7 @@ function Detail(props) {
                     <h4>{findId.title}</h4>
                     <p>{findId.content}</p>
                     <p>{findId.price}원</p>
-                    <Button variant="outline-info" onClick={() => {
-                        dispatch(addItem({id:findId.id, name:findId.title,  count:1}))
-                        nav('/cart')
-                    }}    
-                    >주문하기</Button>
+                    <Button variant="outline-info">주문하기</Button>
                 </div>
             </div>
 
@@ -65,6 +62,9 @@ function Detail(props) {
                 </Nav.Item>
             </Nav>
 
+            {/* 1. 삼항연산자
+            { tab == 0 ? <div>패션은 예술이다</div> : tab == 1 ? <div>퀄리티 높은 재료</div> : <div>내용들</div> }
+            */}
             <TabContent tab = {tab} />
         </div>
     )
@@ -73,6 +73,10 @@ function Detail(props) {
 function TabContent({tab}) {
     let [fade, setFade] = useState('');
 
+    let {stock} = useContext(Context1);
+
+    // react 18버전부터 automatic batching기능
+    // state함수가 근처에 있으면 합쳐서 한꺼번에 state를 변경
     useEffect(() => {
         setTimeout(() => { setFade('end')}, 100);
         return () => {
@@ -82,9 +86,30 @@ function TabContent({tab}) {
 
     return (
         <div className={fade}>
-            {[<div>패션은 예술이다</div>, <div>퀄리티 좋은 재료</div>, <div>내용들</div>][tab]}
+            {[<div>{stock}</div>, <div>{stock[1]}</div>, <div>내용들</div>][tab]}
         </div>
     )
 }
 
+/*
+function TabContent({tab}) {
+
+    // 2. if문으로
+    if(tab == 0) {
+        return <div>패션은 예술이다</div>
+    } else if(tab == 1) {
+        return <div>퀄리티 높은 재료</div>
+    } else {
+        return <div>내용들</div>
+    }
+
+    // 3. 배열로
+    let tabArr = [<div>패션은 예술이다</div>, <div>퀄리티 높은 재료</div>, <div>내용들</div>];
+    return tabArr[tab];
+
+
+    // 4. 2번을 한줄로
+    return [<div>패션은 예술이다</div>, <div>퀄리티 높은 재료</div>, <div>내용들</div>][tab] }
+}
+*/
 export default Detail;
